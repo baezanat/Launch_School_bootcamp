@@ -1,0 +1,25 @@
+<html>
+  <body>
+    <title><%= @title %></title>
+
+    <div>
+      <h2>The files are:<%= @contents %></h2>
+        <ul>
+          <% @contents.map do |filename| %>
+            <li>
+              <p><%= filename %></p>
+            </li>
+          <% end %>
+        </ul>
+
+        <p>
+          <% if params[:sort] == "desc" %>
+            <a href="/">Sort ascending</a>
+          <% else %>
+            <a href="/?sort=desc">Sort descending</a>
+          <% end %>
+        </p>
+    </div>
+  </body>
+
+</html>

@@ -1,0 +1,11 @@
+<h1>User: <%= @user %></h1>
+<p>e-mail: <%= @email %></p>
+<p>interests:</p> 
+<ul>
+  <% @interests.map do |interest| %>
+    <li>
+      <%= interest %> 
+    </li>
+</ul>
+
+

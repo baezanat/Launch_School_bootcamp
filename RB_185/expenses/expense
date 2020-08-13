@@ -1,0 +1,175 @@
+#! /usr/bin/env ruby
+
+require "pry"
+require "pry-byebug"
+require "pg"
+
+class ExpenseData
+  def initialize
+    @conn = PG.connect(dbname: "expenses_project")
+    setup_schema
+  end
+
+  def setup_schema
+    sql = <<~SQL
+      SELECT COUNT(*) FROM information_schema.tables
+      WHERE table_schema = 'public' AND
+      table_name = 'expenses';
+    SQL
+    check = @conn.exec(sql)[0]["count"]
+    return unless check == 0
+    sql_create_table = <<~SQL
+      CREATE TABLE expenses (
+        id serial PRIMARY KEY,
+        amount decimal(6, 2) NOT NULL,
+        memo text NOT NULL,
+        created_on date NOT NULL
+      );
+    SQL
+    @conn.exec(sql_create_table)
+  end
+
+  def list_expenses
+    result = @conn.exec("SELECT * FROM expenses ORDER BY created_on;")
+    display_expenses(result)
+  end
+
+  def add_expense(amount, memo)
+    sql_command = <<~SQL
+      INSERT INTO expenses (amount, memo) VALUES
+      ($1, $2);
+    SQL
+    @conn.exec_params(sql_command, [amount, memo])
+  end
+
+  def print_matching(search_param)
+    sql_command = <<~SQL
+      SELECT * FROM expenses WHERE
+      memo ILIKE $1;
+    SQL
+    match = @conn.exec_params(sql_command, ["%#{search_param}%"])
+    display_expenses(match)
+  end
+
+  def delete(id)
+    sql_find_match = "SELECT * FROM expenses WHERE id = $1;"
+    result = @conn.exec_params(sql_find_match, [id])
+    if !result.values.empty?
+      sql_delete = "DELETE FROM expenses WHERE id = $1"
+      @conn.exec_params(sql_delete, [id])
+      puts "\nThe following expense was deleted:\n"
+      display_expenses(result)
+    else
+      puts "\nThere is no expense with the id '#{id}'."
+    end
+  end
+
+  def clear_all
+    puts "This will remove all expenses. Are you sure? (y/n)"
+    answer = $stdin.getch
+    return unless answer == 'y'
+    @conn.exec("DELETE FROM expenses;")
+  end
+
+  private
+
+  def display_expenses(expenses)
+    display_count(expenses)
+    return unless expenses.ntuples > 0
+    expenses.each do |tuple|
+      puts "#{tuple["id"].rjust(3)} | #{tuple["created_on"].rjust(10)} | #{tuple["amount"].rjust(12)} | #{tuple["memo"]}"
+    end
+    puts "----------------------------------------------"
+    puts "total #{total(expenses).rjust(25)}\n\n"
+  end
+
+  def display_count(expenses)
+    rows = expenses.ntuples
+    if rows > 0
+      puts "\nThere are #{rows} expenses.\n\n"
+    else
+      puts "\nThere are no expenses.\n\n"
+    end
+  end
+
+  def total(expenses)
+    sql = "SELECT SUM(amount) FROM expenses;"
+    @conn.exec(sql).values.pop.pop
+  end
+end
+
+class CLI
+  def initialize
+    @app = ExpenseData.new
+  end
+
+  def run(arguments)
+    command = arguments.first
+    args = arguments[1..-1]
+
+    case command
+    when "list"
+      @app.list_expenses
+    when "add"
+      if args.size == 2
+        @app.add_expense(*args)
+      else
+        add_error
+      end
+    when "search"
+      if args.size == 1
+        @app.print_matching(*args)
+      else
+        search_error
+      end
+    when "delete"
+      if args.empty?
+        delete_empty_id_error
+      elsif args.first.to_i.to_s == args.first
+        @app.delete(*args)
+      else
+        delete_type_error
+      end
+    when "clear"
+      @app.clear_all
+    else
+      display_help
+    end
+  end
+
+  def display_help
+    help_menu = <<-HELP
+
+      An expense recording system
+
+      Commands:
+
+      add AMOUNT MEMO [DATE] - record a new expense
+      clear - delete all expenses
+      list - list all expenses
+      delete NUMBER - remove expense with id NUMBER
+      search QUERY - list expenses with a matching memo field
+
+    HELP
+    puts help_menu
+  end
+
+  def add_error
+    puts "\nYou must provide an amount and memo.\n\n"
+  end
+
+  def search_error
+    puts "\nPlease provide one and only one search parameter.\n\n"
+  end
+
+  def delete_empty_id_error
+    puts "\nPlease enter an id for the expense to delete.\n\n"
+  end
+
+  def delete_type_error
+    puts "\nThe id for the row to delete must be an integer.\n\n"
+  end
+end
+
+CLI.new.run(ARGV)
+

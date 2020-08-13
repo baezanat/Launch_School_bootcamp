@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="TodoListTest" filepath="todolist_test.rb" skipped="0" failures="0" errors="0" tests="16" assertions="33" time="0.00023469799953090842">
+    <testcase name="test_pop" lineno="42" classname="TodoListTest" assertions="2" time="3.052300007766462e-05">
+    </testcase>
+    <testcase name="test_remove_at" lineno="104" classname="TodoListTest" assertions="3" time="3.10939999508264e-05">
+    </testcase>
+    <testcase name="test_last_returns_todos_last_element" lineno="32" classname="TodoListTest" assertions="1" time="8.753999736654805e-06">
+    </testcase>
+    <testcase name="test_done_bang" lineno="96" classname="TodoListTest" assertions="4" time="1.4544999885401921e-05">
+    </testcase>
+    <testcase name="test_size_returns_todos_array_size" lineno="24" classname="TodoListTest" assertions="1" time="6.341000243992312e-06">
+    </testcase>
+    <testcase name="test_mark_undone_at" lineno="86" classname="TodoListTest" assertions="4" time="2.1746999664173927e-05">
+    </testcase>
+    <testcase name="test_that_add_and_shovel_method_are_same" lineno="66" classname="TodoListTest" assertions="1" time="8.976000117399963e-06">
+    </testcase>
+    <testcase name="test_that_to_a_returns_todos_array" lineno="20" classname="TodoListTest" assertions="1" time="6.493000000773463e-06">
+    </testcase>
+    <testcase name="test_to_s" lineno="111" classname="TodoListTest" assertions="1" time="2.3021000288281357e-05">
+    </testcase>
+    <testcase name="test_first_returns_todos_first_element" lineno="28" classname="TodoListTest" assertions="1" time="7.176000053732423e-06">
+    </testcase>
+    <testcase name="test_shovel_method" lineno="60" classname="TodoListTest" assertions="1" time="8.759999673202401e-06">
+    </testcase>
+    <testcase name="test_shift" lineno="36" classname="TodoListTest" assertions="2" time="9.18099976843223e-06">
+    </testcase>
+    <testcase name="test_an_object_that_is_not_todo_raises_a_type_error" lineno="54" classname="TodoListTest" assertions="3" time="2.0587000108207576e-05">
+    </testcase>
+    <testcase name="test_item_at" lineno="73" classname="TodoListTest" assertions="2" time="1.3684999885299476e-05">
+    </testcase>
+    <testcase name="test_done_question_mark" lineno="48" classname="TodoListTest" assertions="2" time="1.014200006466126e-05">
+    </testcase>
+    <testcase name="test_mark_done_at" lineno="78" classname="TodoListTest" assertions="4" time="1.3673000012204284e-05">
+    </testcase>
+  </testsuite>
+</testsuites>

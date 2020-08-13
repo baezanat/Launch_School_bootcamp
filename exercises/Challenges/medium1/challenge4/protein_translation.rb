@@ -1,0 +1,65 @@
+=begin
+of_codon
+- class method
+- INPUT: string, codon code
+- OUTPUT: string, amino acid
+Algorithm:
+- new array with inner arrays with chunks of 3 letters from strand (each is a codon)
+  - initialize an empty 'codon' array
+  - initialize counter = 0
+  - manually loop over the strand array
+    - add strand[counter..counter+2] to `codon` array
+    - counter += 3
+    - break if counter == strand.size - 2
+  - end loop
+  - iterate over 'codon' array using #map and transform to amino acid using hash
+=end
+
+CODON_TO_AA = {
+  'AUG'=>	'Methionine',
+  'UUU' => 'Phenylalanine',
+  'UUC' => 'Phenylalanine',
+  'UUA' => 'Leucine',
+  'UUG' => 'Leucine',
+  'UCU' => 'Serine',
+  'UCC' => 'Serine',
+  'UCA' => 'Serine',
+  'UCG' => 'Serine',
+  'UAU' => 'Tyrosine',
+  'UAC' => 'Tyrosine',
+  'UGU' => 'Cysteine',
+  'UGC' => 'Cysteine',
+  'UGG' => 'Tryptophan',
+  'UAA' => 'STOP',
+  'UAG' => 'STOP',
+  'UGA' => 'STOP'
+}
+
+class Translation
+
+  def self.of_codon(codon)
+    CODON_TO_AA[codon]
+  end
+
+  def self.of_rna(strand)
+    codons = []
+    counter = 0
+    short_strand = strand.sub(/\A(.*)(UAA|UAG|UGA).*\z/, '\1')
+    loop do
+      codons << short_strand[counter..counter + 2]
+      counter += 3
+      break if counter >= short_strand.size - 2
+    end
+    raise InvalidCodonError unless valid_array?(codons)
+    codons.map { |codon| Translation.of_codon(codon) }
+  end
+
+  private
+
+  def self.valid_array?(codon_array)
+    codon_array.all? { |codon| CODON_TO_AA.keys.include?(codon) }
+  end
+end
+
+class InvalidStrandError < StandardError; end
+class InvalidCodonError < StandardError; end
