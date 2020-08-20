@@ -8,6 +8,7 @@ class DatabasePersistence
           else
             PG.connect(dbname: "todos")
           end
+    @logger = logger
   end
 
   def query(statement, *params)
